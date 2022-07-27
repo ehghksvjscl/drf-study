@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ['175.192.165.46', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     'blog.apps.BlogConfig',
     'api.apps.ApiConfig',
+    'api.apps.Api2Config',
+
+    'rest_framework',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -138,3 +141,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # AUTH_USER_MODEL =
 
 # LOGGING =
+
