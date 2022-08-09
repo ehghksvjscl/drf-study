@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['175.192.165.46', '127.0.0.1', 'localhost']
 INSTALLED_APPS = [
     'blog.apps.BlogConfig',
     'api.apps.ApiConfig',
-    'api.apps.Api2Config',
+    'api2.apps.Api2Config',
 
     'rest_framework',
 
@@ -142,3 +142,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # LOGGING =
 
+# DRF
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ]
+}

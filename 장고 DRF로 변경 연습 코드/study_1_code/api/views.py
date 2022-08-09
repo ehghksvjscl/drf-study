@@ -10,7 +10,7 @@ from blog.models import Post, Category, Tag, Comment
 
 class ApiPostLV(BaseListView):
     # model = Post
-    paginate_by = 3
+    paginate_by = 33
 
     def get_queryset(self):
         paramCate = self.request.GET.get('category')
