@@ -1,0 +1,7 @@
+# flask8 항목에서 제외할 것들
+[flake8]
+exclude = 
+    migrations,
+    __pycache__,
+    manage.py,
+    settings.py
