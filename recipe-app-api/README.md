@@ -23,7 +23,7 @@ Image2
 - [x] App 구조
 - [x] 시스템 셋업
 - [x] 프로젝트 셋업
-- [ ] Git Actions 
+- [x] Git Actions 
 - [ ] TDD with Django
 - [ ] Configure Database
 - [ ] Create User Model
