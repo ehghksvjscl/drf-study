@@ -26,8 +26,7 @@ class UserManaager(BaseUserManager):
 
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
-        # save 하는법(특이함..)
-        user.save(using=self._db)
+        user.save()
 
         return user
 
@@ -36,7 +35,7 @@ class UserManaager(BaseUserManager):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
-        user.save(using=self._db)
+        user.save()
 
         return user
 
