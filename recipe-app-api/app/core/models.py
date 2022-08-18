@@ -1,3 +1,40 @@
-from django.db import models
+"""
+Database models
+"""
 
-# Create your models here.
+from django.db import models
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin
+)
+
+# AbstractBaseUser를 사용하면 로그인 방식도 변경할 수 있고, 
+# 원하는 필드들로 유저 모델을 구성할 수 있습니다. 
+# 아래는 email, password를 활용하여 로그인하고 추가적으로 소속된 기관 정보만을 가지는 간단한 유저 모델을 구현하는 예시입니다. 
+# 이 때 BaseUserManager를 상속하는 UserManager를 함께 정의하여 일반 유저 및 슈퍼유저의 생성 방식을 정의해줘야 합니다. 
+# 또한 PermissionsMixin 을 함께 상속하면 Django의 기본그룹, 허가권 관리 등을 사용할 수 있습니다.
+
+class UserManaager(BaseUserManager):
+    """Manager for user"""
+
+    def create_user(self, email, password=None, **extra_field):
+        """Create, save and return a new user"""
+
+        user = self.model(email, **extra_field)
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    """User in the system"""
+    email = models.EmailField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects: UserManaager
+
+    USERNAME_FIELD = "email"
