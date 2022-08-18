@@ -9,7 +9,7 @@ from django.urls import reverse
 class AdminSiteTests(TestCase):
     """Test for Django Admin"""
 
-    def setup(self):
+    def setUp(self):
         """Create user and Client"""
         self.client = Client()
         self.admin_user = get_user_model().objects.create_superuser(
@@ -30,3 +30,10 @@ class AdminSiteTests(TestCase):
 
         self.assertContains(res, self.user.name)
         self.assertContains(res, self.user.email)
+
+    def test_edit_user_page(self):
+        """에디트 페이지 테스트"""
+        url = reverse('admin:core_user_change', args=[self.user.id])
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, 200)
