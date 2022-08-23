@@ -1,4 +1,8 @@
+"""
+View for the user
+"""
 from rest_framework import generics
+from rest_framework.authtoken.views import ObtainAuthToken
 
 from user.serialisers import UserSerializer
 
