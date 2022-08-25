@@ -9,6 +9,10 @@ from django.contrib.auth import get_user_model
 
 from core import models
 
+def create_user(email='user@example.com', password='testpassword123'):
+    """Create user funtion"""
+    return get_user_model().objects.create_user(email, password)
+
 class ModelTests(TestCase):
     """Test models"""
 
@@ -16,10 +20,7 @@ class ModelTests(TestCase):
         """Test creating a user with an email is successful"""
         email = "test@example.com"
         password = 'testpassword'
-        user = get_user_model().objects.create_user(
-            email=email,
-            password=password
-        )
+        user = create_user(email,password)
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -35,14 +36,14 @@ class ModelTests(TestCase):
         ]
 
         for email, expect in sample_emails:
-            user = get_user_model().objects.create_user(email, 'sample123')
+            user = create_user(email, 'sample123')
             self.assertEqual(user.email, expect)
 
     def test_new_user_without_email_raiises_error(self):
         """Test 유저를 생성할때 에러"""
 
         with self.assertRaises(ValueError):
-            get_user_model().objects.create_user('', 'test123')
+            create_user('', 'test123')
 
     def test_create_superuser(self):
         """Test 슈퍼유저 생성"""
@@ -58,10 +59,7 @@ class ModelTests(TestCase):
     def test_create_recipe(self):
         """Test create recipe   """
 
-        user = get_user_model().objects.create_user(
-            "test@example",
-            "testpassword123"
-        )
+        user = create_user("test@example","testpassword123")
         recipe = models.Recipe.objects.create(
             user=user,
             title="Sample recipe name",
@@ -72,3 +70,8 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(recipe), recipe.title)
         
+    def test_create_tag(self):
+        user = create_user()
+        tag = models.Tag.objects.create(user=user, name='Tag1')
+
+        self.assertEqual(str(tag), tag.name)
