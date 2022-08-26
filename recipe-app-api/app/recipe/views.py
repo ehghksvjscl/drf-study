@@ -31,7 +31,9 @@ class ReciepViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class TagViewSet(mixins.DestroyModelMixin
+                ,mixins.UpdateModelMixin
+                ,mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.TagSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -40,3 +42,4 @@ class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         """Retrieve Tag for authencated user"""
         return Tag.objects.filter(user=self.request.user).order_by('-name')
+
