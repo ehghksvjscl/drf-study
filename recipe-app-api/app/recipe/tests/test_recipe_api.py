@@ -197,7 +197,7 @@ class PrivateRecipeAPITests(TestCase):
             'price': Decimal('2.50'),
             'tags':[{'name':'Thai'}, {'name':'Dinner'}]
         }
-        res = self.client.post(RECIPE_URL, payload)
+        res = self.client.post(RECIPE_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipes = models.Recipe.objects.filter(user=self.user)
@@ -218,14 +218,62 @@ class PrivateRecipeAPITests(TestCase):
             'price': Decimal('2.50'),
             'tags':[{'name':'Indian'}, {'name':'Dinner'}]
         }
-        res = self.client.post(RECIPE_URL, payload)
+        res = self.client.post(RECIPE_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipes = models.Recipe.objects.filter(user=self.user)
         self.assertEqual(recipes.count(), 1)
         recipe = recipes[0]
         self.assertEqual(recipe.tags.count(), 2)
-        self.assertIn(tag_indian, recipe.tag.all())
+        self.assertIn(tag_indian, recipe.tags.all())
         for tag in payload['tags']:
             exists = recipe.tags.filter(name=tag['name'], user=self.user).exists()
             self.assertTrue(exists)
+
+    def test_create_tag_on_update(self):
+        """Test creating tag when updating a recipe"""
+
+        recipe = create_recipe(user=self.user)
+
+        payload = {
+            "tags":[{'name':'Lunch'}]
+        }
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_tag = models.Tag.objects.get(user=self.user, name='Lunch')
+        self.assertIn(new_tag, recipe.tags.all())
+
+    def test_update_recipe_assign_tag(self):
+        """업데이트 할 경우 기존 태그 존재 여부 테스트"""
+
+        tag_breakfast = models.Tag.objects.create(user=self.user, name='breakfast')
+        recipe = create_recipe(user=self.user)
+        recipe.tags.add(tag_breakfast)
+
+        tag_lunch = models.Tag.objects.create(user=self.user, name='Lunch')
+        payload = {"tags":[{'name':"Lunch"}]}
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(tag_lunch, recipe.tags.all())
+        self.assertNotIn(tag_breakfast, recipe.tags.all())
+
+    def test_clear_recipe_tag(self):
+        """recipe tag 클린잉"""
+
+        tag = models.Tag.objects.create(user=self.user, name='Dessert')
+        recipe = create_recipe(user=self.user)
+        recipe.tags.add(tag)
+        payload = {
+            'tags':[]
+        }
+
+        url = detail_url(recipe.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(recipe.tags.count(), 0)
+
