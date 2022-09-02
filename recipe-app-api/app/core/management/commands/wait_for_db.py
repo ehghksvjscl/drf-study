@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> Optional[str]:
         """Entrypoint for command"""
-        self.stdout.write('데이터베이스 기다리는중...')
+        self.stdout.write(self.style.WARNING('데이터베이스 기다리는중...'))
         db_up = False
 
         while db_up is False:
@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 self.check(databases=['default'])
                 db_up = True
             except (Psycopg2Error, OperationalError):
-                self.stdout.write('데이터베이스 없음 1초 대기')
+                self.stdout.write(self.style.WARNING('데이터베이스 없음 1초 대기'))
                 time.sleep(1)
 
         self.stdout.write(self.style.SUCCESS("데이터베이스 연결됨!"))

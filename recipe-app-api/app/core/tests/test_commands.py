@@ -26,10 +26,10 @@ class CommandTests(SimpleTestCase):
     def test_wait_for_db_deplay(self, patched_sleep, patched_check):
         """Test waiting for database when getting OperationalError"""
 
-        patched_check.side_effect = [Psycopg2Error] * 2 + \
-            [OperationalError] * 3 + [True]
+        patched_check.side_effect = [Psycopg2Error] * 1 + \
+            [OperationalError] * 1 + [True]
 
         call_command('wait_for_db')
 
-        self.assertEqual(patched_check.call_count, 6)
+        self.assertEqual(patched_check.call_count, 3)
         patched_check.assert_called_with(databases=['default'])
