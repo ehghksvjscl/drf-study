@@ -2,6 +2,7 @@
 Tests for the tags API.
 """
 
+from decimal import Decimal
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -18,6 +19,8 @@ def create_user(email='user@example.com', password='testpassword'):
     """Create and reutnr a user"""
     return get_user_model().objects.create_user(email=email, password=password)
 
+def detail_ingredient(ingredient_id):
+    return reverse('recipe:ingredient-detail' ,args=[ingredient_id])
 
 class PublicIngredientsAPITests(TestCase):
     """Test unauthenticated API request"""
@@ -65,3 +68,27 @@ class PrivateTagAPITests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], ingredient.name)
         self.assertEqual(res.data[0]['id'], ingredient.id)
+
+    def test_update_ingredient(self):
+        ingredient = models.Ingredient.objects.create(user=self.user, name='Cilantro')
+
+        payload = {
+            'name': 'Coriander'
+        }
+        url = detail_ingredient(ingredient.id)
+        res = self.client.patch(url, payload, foramt='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, payload['name'])
+
+    def test_delete_ingredient(self):
+        ingredient = models.Ingredient.objects.create(user=self.user, name='Lettuce')
+        
+        url = detail_ingredient(ingredient.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        ingredients = models.Ingredient.objects.filter(user=self.user)
+        self.assertFalse(ingredients.exists())
+

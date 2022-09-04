@@ -27,25 +27,36 @@ class TagSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     """Serializer for Recipe"""
     tags = TagSerializer(many=True, required=False)
+    ingredients = IngredientSerializer(many=True, required=False)
 
     class Meta:
         model = Recipe
-        fields = ['id', 'title','time_minutes', 'price', 'link', 'tags']
+        fields = ['id', 'title','time_minutes', 'price', 'link', 'tags', 'ingredients']
         read_only_fields = ['id']
 
-    def _get_or_create_tags(self, instance, tags):
+    def _get_or_create_tags(self, recipe_qs, tags):
         """get or create tags"""
 
         auth_user = self.context['request'].user
         for tag in tags:
             tag_obj, _ = Tag.objects.get_or_create(user=auth_user, **tag)
-            instance.tags.add(tag_obj)
+            recipe_qs.tags.add(tag_obj)
+
+    def _get_or_create_ingredients(self, ingredient_qs, ingredients):
+        """get or create ingredients"""
+
+        auth_user = self.context['request'].user
+        for ingredient in ingredients:
+            ingredient_obj, _ = Ingredient.objects.get_or_create(user=auth_user, **ingredient)
+            ingredient_qs.ingredients.add(ingredient_obj)
 
     def create(self, validated_data):
         """Create a recipe"""
         tags = validated_data.pop('tags', [])
+        ingredients = validated_data.pop('ingredients', [])
         recipe = Recipe.objects.create(**validated_data)
         self._get_or_create_tags(recipe, tags)
+        self._get_or_create_ingredients(recipe, ingredients)
 
         return recipe
 
@@ -53,10 +64,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         """Update recipe"""
 
         tags = validated_data.pop('tags', None)
+        ingredients = validated_data.pop('ingredients', None)
         if tags is not None:
             instance.tags.clear()
             self._get_or_create_tags(instance, tags)
 
+        if ingredients is not None:
+            instance.ingredients.clear()
+            self._get_or_create_ingredients(instance, ingredients)
+            
         for key, value in validated_data.items():
             setattr(instance, key, value)
 
