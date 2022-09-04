@@ -22,6 +22,10 @@ RUN python -m venv /py && \
     adduser \
         --disabled-password \
         --no-create-home \   
-        django-user
+        django-user && \
+    mkdir -p /vol/web/nedia && \
+    mkdir -p /vol/web/static && \
+    chown -R django-user:djangp-user /vol && \
+    chmod -R 755 /vol
 ENV PATH="/py/bin:$PATH"
 USER django-user
