@@ -92,3 +92,47 @@ class PrivateTagAPITests(TestCase):
         ingredients = models.Ingredient.objects.filter(user=self.user)
         self.assertFalse(ingredients.exists())
 
+    def test_filter_ingredients_assigned_to_recipes(self):
+        """ Test listing ingredients by those assigned to recipe"""
+
+        in1 = models.Ingredient.objects.create(user=self.user, name='Apples')
+        in2 = models.Ingredient.objects.create(user=self.user, name='Turkey')
+        recipe = models.Recipe.objects.create(
+            title='Apple Crumble',
+            time_minutes = 5,
+            price=Decimal('4.40'),
+            user=self.user
+        )
+
+        recipe.ingredients.add(in1)
+
+        res = self.client.get(INGREDIENTS_URL, {'assigned_only':1})
+
+        s1 = serializers.IngredientSerializer(in1)
+        s2 = serializers.IngredientSerializer(in2)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
+
+    def test_filtered_ingredients_unique(self):
+        """Test filtered ingredients return a unique list"""
+
+        ingrdient = models.Ingredient.objects.create(user=self.user, name='Eggs')
+        models.Ingredient.objects.create(user=self.user, name='Lentils')
+        recipe1 = models.Recipe.objects.create(
+            title='Eggs Benedict',
+            time_minutes = 40,
+            price=Decimal('7.0'),
+            user=self.user
+        )
+        recipe2 = models.Recipe.objects.create(
+            title='Herb Eggs',
+            time_minutes = 20,
+            price=Decimal('4.0'),
+            user=self.user
+        )
+        recipe1.ingredients.add(ingrdient)
+        recipe2.ingredients.add(ingrdient)
+
+        res = self.client.get(INGREDIENTS_URL, {'assigned_only':1})
+
+        self.assertEqual(len(res.data), 1)

@@ -2,6 +2,9 @@
 Database models
 """
 
+import os
+import uuid
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -9,6 +12,13 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin
 )
+
+def recipe_image_file_path(instance, filename):
+    """image file path 생성"""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+
+    return os.path.join('uploads', 'recipe', filename)
 
 # AbstractBaseUser를 사용하면 로그인 방식도 변경할 수 있고, 
 # 원하는 필드들로 유저 모델을 구성할 수 있습니다. 
@@ -62,6 +72,7 @@ class Recipe(models.Model):
     link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField('Tag')
     ingredients = models.ManyToManyField('Ingredient')
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path)
 
     def __str__(self) -> str:
         return self.title
