@@ -429,7 +429,7 @@ class ImageUploadTests(TestCase):
     def tearDown(self) -> None:
         self.recipe.image.delete()
 
-    # 실 서버 검증 필요
+    # 실 서버 검증 필요 
     def test_upload_image(self):
         """Test uploading an image to a recipe"""
 
