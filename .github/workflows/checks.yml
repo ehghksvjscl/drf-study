@@ -1,9 +1,11 @@
 ---
 name: Checks
 
-on: [push]
-  paths:
-    - "recipe-app-api/**"
+on: 
+  push:
+    paths:
+      - "recipe-app-api/**"
+    branch: [master]
 
 jobs:
   test-lint:
