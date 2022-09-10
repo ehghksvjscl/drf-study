@@ -2,6 +2,11 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Review(models.Model):
+    type = models.CharField(max_length=255, unique=True)
+    contract = models.ManyToManyField("Contract")
+    
+
 class Contract(models.Model):
     title = models.CharField(verbose_name="제목", max_length=256)
     is_confirmed = models.BooleanField(verbose_name="계약 확인 여부", default=False)
@@ -43,7 +48,10 @@ class Contract(models.Model):
         null=True,
         blank=True,
     )
+    is_reviewed = models.BooleanField(default=True)
+    is_private = models.BooleanField(default=True)
 
+    
     class Meta:
         db_table = "contract"
         verbose_name = "계약"

@@ -3,7 +3,15 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, UpdateModelMixin
 from rest_framework.request import Request
 
-from contract.models import Contract
+from contract.models import Contract, Review
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            "type"
+        ]
 
 
 class ContractSerializer(serializers.ModelSerializer):
@@ -17,6 +25,7 @@ class ContractSerializer(serializers.ModelSerializer):
 
 class ContractCreateSerializer(serializers.ModelSerializer):
     manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    reviews = ReviewSerializer(many=True, required=False)
 
     class Meta:
         model = Contract
@@ -25,6 +34,7 @@ class ContractCreateSerializer(serializers.ModelSerializer):
             "title",
             "manager",
             "is_reviewed",
+            "reviews",
         ]
         extra_kwargs = {
             "id": {"read_only": True},
@@ -52,19 +62,17 @@ class ContractUpdateSerializer(serializers.ModelSerializer):
         }
 
 
-class ContractListView(ListModelMixin, GenericAPIView):
+
+
+class ContractView(ListModelMixin, CreateModelMixin, GenericAPIView):
     queryset = Contract.objects.order_by("-id")
     serializer_class = ContractSerializer
 
     def get(self, request: Request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-
-class ContractCreateView(CreateModelMixin, GenericAPIView):
-    queryset = Contract.objects.order_by("-id")
-    serializer_class = ContractCreateSerializer
-
     def post(self, request: Request, *args, **kwargs):
+        self.serializer_class = ContractCreateSerializer
         return self.create(request, *args, **kwargs)
 
 
