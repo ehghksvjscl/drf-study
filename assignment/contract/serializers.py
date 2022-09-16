@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from contract.models import Contract, Review
+from contract.models import Contract, Review, TEAM_LIST
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -12,36 +12,41 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ContractSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Contract
-        fields = [
-            "id",
-            "title",
-        ]
-
-
-class ContractCreateSerializer(serializers.ModelSerializer):
     manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    reviews = ReviewSerializer(many=True, required=False)
 
     class Meta:
         model = Contract
         fields = [
             "id",
             "title",
+            "is_private",
             "manager",
-            "is_reviewed",
-            "reviews",
-            "review_types",
         ]
+
         extra_kwargs = {
             "id": {"read_only": True},
-            "is_reviewed": {"read_only": True},
-            "review_types": {"read_only": True},
         }
 
-        def create(self, validated_data):
-            print(validated_data)
+
+class ContractCreateSerializer(ContractSerializer):
+    review_teams123 = serializers.MultipleChoiceField(choices=TEAM_LIST, write_only=True)
+
+    class Meta:
+        model = Contract
+        fields = ContractSerializer.Meta.fields + ["review_teams"]
+
+    def create(self, validated_data):
+        review_teams = validated_data.pop("review_teams")
+        contract = Contract.objects.create(**validated_data)
+
+        reviews = []
+        for team in review_teams:
+            reviews.append(Review(team=team, contract=contract))
+
+        Review.objects.bulk_create(reviews)
+
+        return contract
+
 
 
 class ContractUpdateSerializer(serializers.ModelSerializer):

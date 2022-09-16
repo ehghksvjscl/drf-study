@@ -24,7 +24,7 @@ class ContractListViewTestCase(TestCase):
         # 계약 등록
         res = self.client.post(
             path="/contracts/",
-            data={"title": "계약 명", "review_types": ["FINANCE_TEAM"]},
+            data={"title": "계약 명", "review_teams": ["FINANCE_TEAM"]},
             content_type="application/json",
         )
         self.assertEqual(res.status_code, 201)
@@ -37,7 +37,7 @@ class ContractListViewTestCase(TestCase):
         self.assertEqual(len(contract.review_set.all()), 1)
 
         for review in contract.review_set.all():
-            self.assertEqual(review.type, "FINANCE_TEAM")
+            self.assertEqual(review.team, "FINANCE_TEAM")
 
         return contract
 
