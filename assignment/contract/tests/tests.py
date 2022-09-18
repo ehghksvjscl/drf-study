@@ -41,75 +41,79 @@ class ContractListViewTestCase(TestCase):
 
         return contract
 
-    # def test_비공개_계약을_등록한다(self):
-    #     self.client.force_login(self.일반사용자)
+    def test_비공개_계약을_등록한다(self):
+        self.client.force_login(self.일반사용자)
 
-    #     # 계약 등록
-    #     res = self.client.post(
-    #         path="/contracts/",
-    #         data={
-    #             "title": "계약 명",
-    #             "review_types": ["FINANCE_TEAM"],
-    #             "is_private": True,
-    #         },
-    #         content_type="application/json",
-    #     )
-    #     self.assertEqual(res.status_code, 201)
-    #     data = res.json()
-    #     self.assertIsNotNone(data["id"])
+        # 계약 등록
+        res = self.client.post(
+            path="/contracts/",
+            data={
+                "title": "계약 명",
+                "review_teams": ["FINANCE_TEAM"],
+                "is_private": True,
+            },
+            content_type="application/json",
+        )
+        self.assertEqual(res.status_code, 201)
+        data = res.json()
+        self.assertIsNotNone(data["id"])
 
-    #     contract = Contract.objects.get(pk=data["id"])
-    #     self.assertEqual(data["id"], contract.id)
-    #     self.assertTrue(contract.is_private)
+        contract = Contract.objects.get(pk=data["id"])
+        self.assertEqual(data["id"], contract.id)
+        self.assertTrue(contract.is_private)
 
-    #     for review in contract.review_set.all():
-    #         self.assertEqual(review.type, "FINANCE_TEAM")
+        self.assertEqual(len(contract.review_set.all()), 1)
 
-    # def test_재무팀_사용자로_비공개_계약을_등록한다(self):
-    #     self.client.force_login(self.재무팀사용자)
+        for review in contract.review_set.all():
+            self.assertEqual(review.team, "FINANCE_TEAM")
 
-    #     # 계약 등록
-    #     res = self.client.post(
-    #         path="/contracts/",
-    #         data={
-    #             "title": "계약 명",
-    #             "review_types": ["FINANCE_TEAM"],
-    #             "is_private": True,
-    #         },
-    #         content_type="application/json",
-    #     )
-    #     self.assertEqual(res.status_code, 201)
-    #     data = res.json()
-    #     self.assertIsNotNone(data["id"])
+    def test_재무팀_사용자로_비공개_계약을_등록한다(self):
+        self.client.force_login(self.재무팀사용자)
 
-    #     contract = Contract.objects.get(pk=data["id"])
-    #     self.assertEqual(data["id"], contract.id)
-    #     self.assertTrue(contract.is_private)
+        # 계약 등록
+        res = self.client.post(
+            path="/contracts/",
+            data={
+                "title": "계약 명",
+                "review_teams": ["FINANCE_TEAM"],
+                "is_private": True,
+            },
+            content_type="application/json",
+        )
 
-    #     for review in contract.review_set.all():
-    #         self.assertEqual(review.type, "FINANCE_TEAM")
+        self.assertEqual(res.status_code, 201)
+        data = res.json()
+        self.assertIsNotNone(data["id"])
 
-    # def test_재무팀과_보안기술팀_확인이_필요한_공개_계약을_등록한다(self):
-    #     self.client.force_login(self.일반사용자)
+        contract = Contract.objects.get(pk=data["id"])
+        self.assertEqual(data["id"], contract.id)
+        self.assertTrue(contract.is_private)
 
-    #     # 계약 등록
-    #     res = self.client.post(
-    #         path="/contracts/",
-    #         data={
-    #             "title": "계약 명",
-    #             "review_types": ["FINANCE_TEAM", "SECURITY_TECH_TEAM"],
-    #         },
-    #         content_type="application/json",
-    #     )
-    #     data = res.json()
-    #     print(data)
+        self.assertEqual(len(contract.review_set.all()), 1)
 
-    #     self.assertIsNotNone(data["id"])
-    #     self.assertEqual(data["title"], "계약 명")
-    #     print(data)
+        for review in contract.review_set.all():
+            self.assertEqual(review.team, "FINANCE_TEAM")
 
-    #     for review in data["reviews"]:
-    #         self.assertIn(review["type"], ["FINANCE_TEAM", "SECURITY_TECH_TEAM"])
+    def test_재무팀과_보안기술팀_확인이_필요한_공개_계약을_등록한다(self):
+        self.client.force_login(self.일반사용자)
+
+        # 계약 등록
+        res = self.client.post(
+            path="/contracts/",
+            data={
+                "title": "계약 명",
+                "review_teams": ["FINANCE_TEAM", "SECURITY_TECH_TEAM"],
+            },
+            content_type="application/json",
+        )
+        data = res.json()
+
+        self.assertIsNotNone(data["id"])
+        self.assertEqual(data["title"], "계약 명")
+        self.assertEqual(len(data["reviews"]), 2)
+
+        for review in data["reviews"]:
+            self.assertIn(review["team"], ["FINANCE_TEAM", "SECURITY_TECH_TEAM"])
 
     # def test_계약의_제목을_수정한다(self):
     #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()

@@ -7,12 +7,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
-            "type"
+            "team"
         ]
 
 
 class ContractSerializer(serializers.ModelSerializer):
     manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    reviews = ReviewSerializer(source="review_set", many=True, read_only=True)
 
     class Meta:
         model = Contract
@@ -21,6 +22,7 @@ class ContractSerializer(serializers.ModelSerializer):
             "title",
             "is_private",
             "manager",
+            "reviews",
         ]
 
         extra_kwargs = {
@@ -29,7 +31,7 @@ class ContractSerializer(serializers.ModelSerializer):
 
 
 class ContractCreateSerializer(ContractSerializer):
-    review_teams123 = serializers.MultipleChoiceField(choices=TEAM_LIST, write_only=True)
+    review_teams = serializers.MultipleChoiceField(choices=TEAM_LIST, write_only=True)
 
     class Meta:
         model = Contract
