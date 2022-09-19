@@ -115,33 +115,34 @@ class ContractListViewTestCase(TestCase):
         for review in data["reviews"]:
             self.assertIn(review["team"], ["FINANCE_TEAM", "SECURITY_TECH_TEAM"])
 
-    # def test_계약의_제목을_수정한다(self):
-    #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
+    def test_계약의_제목을_수정한다(self):
+        contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
 
-    #     # 생성한 계약을 수정
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/",
-    #         data={"title": "새로운 계약 명"},
-    #         content_type="application/json",
-    #     )
-    #     data = res.json()
-    #     self.assertIsNotNone(data["id"])
+        # 생성한 계약을 수정
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/",
+            data={"title": "새로운 계약 명"},
+            content_type="application/json",
+        )
 
-    #     contract = Contract.objects.get(pk=data["id"])
-    #     self.assertEqual(contract.title, "새로운 계약 명")
+        data = res.json()
+        self.assertIsNotNone(data["id"])
 
-    # def test_본인의_담당이_아닌_계약을_수정한다(self):
-    #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
+        contract = Contract.objects.get(pk=data["id"])
+        self.assertEqual(contract.title, "새로운 계약 명")
 
-    #     self.client.force_login(self.기타사용자)
+    def test_본인의_담당이_아닌_계약을_수정한다(self):
+        contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
 
-    #     # 생성한 계약을 수정
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/",
-    #         data={"title": "새로운 계약 명"},
-    #         content_type="application/json",
-    #     )
-    #     self.assertEqual(res.status_code, 403)
+        self.client.force_login(self.기타사용자)
+
+        # 생성한 계약을 수정
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/",
+            data={"title": "새로운 계약 명"},
+            content_type="application/json",
+        )
+        self.assertEqual(res.status_code, 403)
 
     # def test_계약의_재무팀_담당자를_지정한다(self):
     #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()

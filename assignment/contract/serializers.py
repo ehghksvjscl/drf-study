@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 
 from contract.models import Contract, Review, TEAM_LIST
 
@@ -52,23 +53,18 @@ class ContractCreateSerializer(ContractSerializer):
 
 
 class ContractUpdateSerializer(serializers.ModelSerializer):
+
+    def update(self, instance, validated_data):
+        if self.context['request'].user != instance.manager:
+            raise PermissionDenied()
+        return super().update(instance, validated_data)
+
     class Meta:
         model = Contract
         fields = [
             "id",
             "title",
-            "is_legal_team_confirmed",
-            "legal_team_manager",
-            "is_finance_team_confirmed",
-            "finance_team_manager",
-            "is_security_team_confirmed",
-            "security_team_manager",
-            "is_reviewed",
         ]
         extra_kwargs = {
             "id": {"read_only": True},
-            "is_reviewed": {"read_only": True},
         }
-
-
-
