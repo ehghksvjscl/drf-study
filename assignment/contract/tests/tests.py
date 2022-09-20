@@ -150,13 +150,12 @@ class ContractListViewTestCase(TestCase):
         # 기본 상태를 체크한다.
         contract = Contract.objects.get(pk=contract.id)
         review = contract.review_set.filter(team="FINANCE_TEAM").first()
-        print(review.manager)
         self.assertIsNotNone(review)
         self.assertIsNone(review.manager)
 
         # 생성한 계약의 재무팀 담당자를 수정한다.
         res = self.client.patch(
-            path=f"/contracts/{contract.id}/reviews/FINANCE_TEAM/",
+            path=f"/contracts/{contract.id}/reviews/{review.id}/",
             data={"manager": self.재무팀사용자.id},
             content_type="application/json",
         )

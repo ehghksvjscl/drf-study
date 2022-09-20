@@ -52,7 +52,7 @@ class ContractCreateSerializer(ContractSerializer):
 
 
 
-class ContractUpdateSerializer(serializers.ModelSerializer):
+class ContractUpdateSerializer(ContractSerializer):
 
     def update(self, instance, validated_data):
         if self.context['request'].user != instance.manager:
