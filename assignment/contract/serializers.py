@@ -57,6 +57,7 @@ class ContractUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if self.context['request'].user != instance.manager:
             raise PermissionDenied()
+            
         return super().update(instance, validated_data)
 
     class Meta:

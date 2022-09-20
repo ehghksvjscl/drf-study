@@ -144,30 +144,31 @@ class ContractListViewTestCase(TestCase):
         )
         self.assertEqual(res.status_code, 403)
 
-    # def test_계약의_재무팀_담당자를_지정한다(self):
-    #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
+    def test_계약의_재무팀_담당자를_지정한다(self):
+        contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
 
-    #     # 기본 상태를 체크한다.
-    #     contract = Contract.objects.get(pk=contract.id)
-    #     review = contract.review_set.filter(type="FINANCE_TEAM").first()
-    #     self.assertIsNotNone(review)
-    #     self.assertIsNone(review.manager)
+        # 기본 상태를 체크한다.
+        contract = Contract.objects.get(pk=contract.id)
+        review = contract.review_set.filter(team="FINANCE_TEAM").first()
+        print(review.manager)
+        self.assertIsNotNone(review)
+        self.assertIsNone(review.manager)
 
-    #     # 생성한 계약의 재무팀 담당자를 수정한다.
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/reviews/FINANCE_TEAM/",
-    #         data={"manager": self.재무팀사용자.id},
-    #         content_type="application/json",
-    #     )
-    #     self.assertIs(res.status_code, 200)
+        # 생성한 계약의 재무팀 담당자를 수정한다.
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/reviews/FINANCE_TEAM/",
+            data={"manager": self.재무팀사용자.id},
+            content_type="application/json",
+        )
+        self.assertIs(res.status_code, 200)
 
-    #     contract = Contract.objects.get(pk=contract.id)
-    #     review = contract.review_set.filter(type="FINANCE_TEAM").first()
-    #     self.assertIsNotNone(review)
-    #     self.assertIsNotNone(review.manager)
-    #     self.assertIs(review.manager.id, self.재무팀사용자.id)
+        contract = Contract.objects.get(pk=contract.id)
+        review = contract.review_set.filter(team="FINANCE_TEAM").first()
+        self.assertIsNotNone(review)
+        self.assertIsNotNone(review.manager)
+        self.assertIs(review.manager.id, self.재무팀사용자.id)
 
-    #     return contract
+        return contract
 
     # def test_재무팀_사용자로_계약의_재무팀_상태를_수정한다(self):
     #     contract = self.test_계약의_재무팀_담당자를_지정한다()
