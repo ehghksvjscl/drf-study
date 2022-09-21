@@ -11,7 +11,14 @@ class CustomUserAdmin(UserAdmin):
         (
             _("기본정보"),
             {
-                "fields": ("username", "password"),
+                "fields": (
+                    "avatar",
+                    "gender",
+                    "language",
+                    "curreny",
+                    "username",
+                    "password",
+                ),
             },
         ),
         (
