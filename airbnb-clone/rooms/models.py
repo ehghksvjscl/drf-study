@@ -16,12 +16,15 @@ class Room(BaseTimeTamplate):
     price = models.PositiveBigIntegerField(default=0)
     rooms = models.PositiveSmallIntegerField(default=0)
     toilets = models.PositiveSmallIntegerField(default=0)
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=150)
     is_pet_friendly = models.BooleanField(default=True)
     kind = models.CharField(max_length=50, choices=KindChoices.choices)
     onwer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     amenitys = models.ManyToManyField("Amenity")
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Amenity(BaseTimeTamplate):
@@ -30,3 +33,6 @@ class Amenity(BaseTimeTamplate):
 
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        verbose_name_plural = 'Amenities'
