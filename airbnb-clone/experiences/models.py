@@ -22,6 +22,12 @@ class Experience(BaseTimeTamplate):
     start = models.TimeField()
     end = models.TimeField()
     perks = models.ManyToManyField("Perk")
+    category = models.ForeignKey(
+        "categories.Category",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self) -> str:
         return self.name

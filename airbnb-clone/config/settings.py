@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "common",
     "experiences",
     "categories",
+    "reviews",
 ]
 
 MIDDLEWARE = [

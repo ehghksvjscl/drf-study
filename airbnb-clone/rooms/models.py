@@ -9,7 +9,7 @@ class Room(BaseTimeTamplate):
         ENTRIE_PLACE = ("entire_place", "Entire_place")
         PRIVATE_ROOM = ("private_room", "Private_room")
         SHARED_ROOM = ("shared_room", "Shared_room")
-        
+
     name = models.CharField(max_length=150, default="")
     country = models.CharField(max_length=50, default="한국")
     city = models.CharField(max_length=50, default="서울")
@@ -22,6 +22,12 @@ class Room(BaseTimeTamplate):
     kind = models.CharField(max_length=50, choices=KindChoices.choices)
     onwer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     amenitys = models.ManyToManyField("Amenity")
+    category = models.ForeignKey(
+        "categories.Category",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self) -> str:
         return self.name
@@ -35,4 +41,4 @@ class Amenity(BaseTimeTamplate):
         return self.name
 
     class Meta:
-        verbose_name_plural = 'Amenities'
+        verbose_name_plural = "Amenities"
