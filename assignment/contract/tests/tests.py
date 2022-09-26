@@ -1,6 +1,6 @@
 from time import sleep
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from test_plus.test import TestCase
 from contract.models import Contract
 
@@ -10,13 +10,30 @@ class ContractListViewTestCase(TestCase):
     def setUp(self) -> None:
         super().setUp()
         # User
-        self.일반사용자 = User.objects.create(username="일반사용자")
-        self.재무팀사용자 = User.objects.create(username="재무팀사용자")
-        self.법무팀사용자 = User.objects.create(username="법무팀사용자")
-        self.보안팀사용자 = User.objects.create(username="보안팀사용자")
-        self.보안기술팀사용자 = User.objects.create(username="보안기술팀사용자")
-        self.기타사용자 = User.objects.create(username="기타사용자")
-
+        self.일반사용자 = get_user_model().objects.create(
+            username="일반사용자",
+            team="NO_TEAM",
+        )
+        self.재무팀사용자 = get_user_model().objects.create(
+            username="재무팀사용자",
+            team="FINANCE_TEAM",
+        )
+        self.법무팀사용자 = get_user_model().objects.create(
+            username="법무팀사용자",
+            team="LEGAL_TEAM",
+        )
+        self.보안팀사용자 = get_user_model().objects.create(
+            username="보안팀사용자",
+            team="SECURITY_TEAM",
+        )
+        self.보안기술팀사용자 = get_user_model().objects.create(
+            username="보안기술팀사용자",
+            team="SECURITY_TECH_TEAM",
+        )
+        self.기타사용자 = get_user_model().objects.create(
+            username="기타사용자",
+            team="NO_TEAM",
+        )
 
     def test_재무팀_확인이_필요한_공개_계약을_등록한다(self):
         self.client.force_login(self.일반사용자)
@@ -169,78 +186,81 @@ class ContractListViewTestCase(TestCase):
 
         return contract
 
-    # def test_재무팀_사용자로_계약의_재무팀_상태를_수정한다(self):
-    #     contract = self.test_계약의_재무팀_담당자를_지정한다()
+    def test_재무팀_사용자로_계약의_재무팀_상태를_수정한다(self):
+        contract = self.test_계약의_재무팀_담당자를_지정한다()
+        review = contract.review_set.filter(team="FINANCE_TEAM").first()
 
-    #     self.client.force_login(self.재무팀사용자)
+        self.client.force_login(self.재무팀사용자)
 
-    #     # 생성한 계약의 재무팀 담당자를 수정한다.
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/reviews/FINANCE_TEAM/",
-    #         data={"is_confirmed": True},
-    #         content_type="application/json",
-    #     )
-    #     self.assertIs(res.status_code, 200)
+        # 생성한 계약의 재무팀 담당자를 수정한다.
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/reviews/{review.id}/",
+            data={"is_confirmed": True},
+            content_type="application/json",
+        )
+        self.assertIs(res.status_code, 200)
+        review.refresh_from_db()
 
-    #     contract = Contract.objects.get(pk=contract.id)
-    #     review = contract.review_set.filter(type="FINANCE_TEAM").first()
-    #     self.assertIsNotNone(review)
-    #     self.assertIsNotNone(review.manager)
-    #     self.assertEqual(review.manager, self.재무팀사용자)
-    #     self.assertTrue(review.is_confirmed)
+        self.assertIsNotNone(review)
+        self.assertIsNotNone(review.manager)
+        self.assertEqual(review.manager, self.재무팀사용자)
+        self.assertTrue(review.is_confirmed)
 
-    # def test_법무팀_사용자로_계약의_재무팀_상태를_수정한다(self):
-    #     contract = self.test_계약의_재무팀_담당자를_지정한다()
+    def test_법무팀_사용자로_계약의_재무팀_상태를_수정한다(self):
+        contract = self.test_계약의_재무팀_담당자를_지정한다()
+        review = contract.review_set.filter(team="FINANCE_TEAM").first()
 
-    #     self.client.force_login(self.법무팀사용자)
+        self.client.force_login(self.법무팀사용자)
 
-    #     # 생성한 계약의 재무팀 담당자를 수정한다.
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/reviews/FINANCE_TEAM/",
-    #         data={"is_confirmed": True},
-    #         content_type="application/json",
-    #     )
-    #     self.assertEqual(res.status_code, 403)
+        # 생성한 계약의 재무팀 담당자를 수정한다.
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/reviews/{review.id}/",
+            data={"is_confirmed": True},
+            content_type="application/json",
+        )
+        self.assertEqual(res.status_code, 403)
 
-    # def test_계약_확인_담당_팀을_수정한다(self):
-    #     """
-    #     ["FINANCE_TEAM"] -> ["SECURITY_TEAM", "LEGAL_TEAM"]
-    #     """
-    #     contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
+    def test_계약_확인_담당_팀을_수정한다(self):
+        """
+        ["FINANCE_TEAM"] -> ["SECURITY_TEAM", "LEGAL_TEAM"]
+        """
+        contract = self.test_재무팀_확인이_필요한_공개_계약을_등록한다()
 
-    #     # 생성한 계약을 수정
-    #     res = self.client.patch(
-    #         path=f"/contracts/{contract.id}/",
-    #         data={"review_types": ["SECURITY_TEAM", "LEGAL_TEAM"]},
-    #         content_type="application/json",
-    #     )
-    #     data = res.json()
-    #     self.assertIsNotNone(data["id"])
+        # 생성한 계약을 수정
+        res = self.client.patch(
+            path=f"/contracts/{contract.id}/",
+            data={"review_teams": ["SECURITY_TEAM", "LEGAL_TEAM"]},
+            content_type="application/json",
+        )
+        data = res.json()
+        self.assertIsNotNone(data["id"])
 
-    #     contract = Contract.objects.get(pk=data["id"])
-    #     for review in contract.review_set.all():
-    #         with self.subTest(state="수정", review_type=review):
-    #             self.assertIn(review.type, ["SECURITY_TEAM", "LEGAL_TEAM"])
+        contract = Contract.objects.get(pk=data["id"])
+        for review in contract.review_set.all():
+            with self.subTest(state="수정", team=review):
+                self.assertIn(review.team, ["SECURITY_TEAM", "LEGAL_TEAM"])
 
-    # def test_내가_만든_공개_계약을_조회한다(self):
-    #     for _ in range(20):
-    #         self.test_계약의_재무팀_담당자를_지정한다()
+    def test_내가_만든_공개_계약을_조회한다(self):
+        for _ in range(20):
+            self.test_계약의_재무팀_담당자를_지정한다()
 
-    #     sleep(2)
-    #     print("=== created ===", flush=True)
-    #     sleep(2)
+        sleep(2)
+        print("=== created ===", flush=True)
+        sleep(2)
+        # 생성한 계약을 조회
+        # with self.assertNumQueriesLessThan(7):
+        #     res = self.client.get(path="/contracts/")
 
-    #     # 생성한 계약을 조회
-    #     with self.assertNumQueriesLessThan(7):
-    #         res = self.client.get(path="/contracts/")
+        res = self.client.get(path="/contracts/")
+        print(res.data)
 
-    #     data = res.json()
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(len(data), 20)
-    #     for contract_data in data:
-    #         self.assertEqual(contract_data["manager_username"], self.일반사용자.username)
-    #         for review_data in contract_data["reviews"]:
-    #             self.assertEqual(review_data["manager_username"], self.재무팀사용자.username)
+        data = res.json()
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(data), 20)
+        for contract_data in data:
+            self.assertEqual(contract_data["manager_username"], self.일반사용자.username)
+            for review_data in contract_data["reviews"]:
+                self.assertEqual(review_data["manager_username"], self.재무팀사용자.username)
 
     # def test_내가_만든_비공개_계약을_조회한다(self):
     #     for _ in range(20):

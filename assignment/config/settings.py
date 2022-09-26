@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "contract",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -131,6 +132,9 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+# CustomUser
+AUTH_USER_MODEL = "users.User"
 
 LOGGING = {
     "version": 1,
