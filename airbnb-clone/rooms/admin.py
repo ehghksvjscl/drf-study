@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin import SimpleListFilter
 
 from rooms.models import Room, Amenity
 
