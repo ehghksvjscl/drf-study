@@ -8,7 +8,11 @@ class Review(BaseTimeTamplate):
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     room = models.ForeignKey(
-        "rooms.Room", null=True, blank=True, on_delete=models.CASCADE
+        "rooms.Room",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="reviews",
     )
     experience = models.ForeignKey(
         "experiences.Experience", null=True, blank=True, on_delete=models.CASCADE

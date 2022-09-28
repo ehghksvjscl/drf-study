@@ -21,13 +21,27 @@ class Room(BaseTimeTamplate):
     is_pet_friendly = models.BooleanField(default=True)
     kind = models.CharField(max_length=50, choices=KindChoices.choices)
     onwer = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    amenitys = models.ManyToManyField("Amenity")
+    amenities = models.ManyToManyField("Amenity")
     category = models.ForeignKey(
         "categories.Category",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
+
+    def total_amenities(room):
+        return room.amenities.count()
+
+    def rating(room):
+        review_count = room.reviews.count()
+        if review_count == 0:
+            return "No Review"
+        else:
+            total_rating = 0
+            for review in room.reviews.all().values("rating"):
+                total_rating = review.get("rating")
+
+            return round(total_rating / review_count, 2)
 
     def __str__(self) -> str:
         return self.name
