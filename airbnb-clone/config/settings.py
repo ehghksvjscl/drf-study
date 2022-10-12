@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -145,3 +144,8 @@ AUTH_USER_MODEL = "users.User"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# DRF Setting
+REST_FRAMEWORK = {
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
+}
