@@ -4,10 +4,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from rooms.models import Amenity
-from rooms.serializers import AmenitySerializer
+from rooms.models import Amenity, Room
+from rooms.serializers import AmenitySerializer, RoomSerializer
 
 
+# Amenities
 class Amenities(APIView):
     def get(self, request):
         amenities = Amenity.objects.all()
@@ -22,8 +23,8 @@ class Amenities(APIView):
         else:
             return Response(serializer.errors)
 
-class AmenityDetail(APIView):
 
+class AmenityDetail(APIView):
     def get_object(self, pk):
         return get_object_or_404(Amenity, pk=pk)
 
@@ -45,3 +46,19 @@ class AmenityDetail(APIView):
         amenity = self.get_object(pk)
         amenity.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# Room
+class Rooms(APIView):
+    def get(self, request):
+        rooms = Room.objects.all()
+        serializer = RoomSerializer(rooms, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = RoomSerializer(data=request.data)
+        if serializer.is_valid():
+            room = serializer.save()
+            return Response(RoomSerializer(room).data)
+        else:
+            return Response(serializer.errors)
