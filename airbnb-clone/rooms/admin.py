@@ -26,7 +26,7 @@ class RoomsAdmin(admin.ModelAdmin):
         "rooms",
         "toilets",
         "kind",
-        "onwer",
+        "owner",
     )
 
     list_filter = ("amenities",)
@@ -34,7 +34,7 @@ class RoomsAdmin(admin.ModelAdmin):
     search_fields = (
         "name",
         "=price",
-        "^onwer__username",
+        "^owner__username",
     )
 
 
