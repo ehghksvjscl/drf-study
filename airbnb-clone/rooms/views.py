@@ -9,8 +9,8 @@ from rest_framework.exceptions import NotAuthenticated, ParseError
 from rooms.models import Amenity, Room
 from rooms.serializers import AmenitySerializer, RoomSerializer, RoomDetailSerializer
 from rooms.decorator import room_auth_check
-from categories.models import Category
 from categories.crud import get_category_or_400
+from rooms.crud import create_room_amenites
 
 # Amenities
 class Amenities(APIView):
@@ -67,20 +67,8 @@ class Rooms(APIView):
                 # Category
                 category = get_category_or_400(request.data.get("category"))
 
-                try:
-                    # Start transction
-                    with transaction.atomic():
-
-                        # Room
-                        room = serializer.save(owner=request.user, category=category)
-
-                        # Amenities
-                        amenities = request.data.get("amenities")
-                        for amenity_pk in amenities:
-                            amenity = Amenity.objects.get(pk=amenity_pk)
-                            room.amenities.add(amenity)
-                except Exception:
-                    raise ParseError("Amenity not found")
+                # Amenity
+                room = create_room_amenites(request, serializer, category)
 
                 return Response(RoomDetailSerializer(room).data)
             else:
@@ -105,14 +93,13 @@ class RoomDetail(APIView):
         if serializer.is_valid():
 
             # Category
-            category = get_category_or_400(
-                request.data.get("category", room.category_id)
-            )
+            category_pk = request.data.get("category", room.category_id)
+            category = get_category_or_400(category_pk)
 
-            # updated_room = serializer.save()
-            # return Response(RoomDetailSerializer(updated_room).data)
-            print(category)
-            return Response(status=status.HTTP_200_OK)
+            # Amenity
+            room = create_room_amenites(request, serializer, category)
+
+            return Response(RoomDetailSerializer(room).data)
 
         else:
             return Response(serializer.errors)
