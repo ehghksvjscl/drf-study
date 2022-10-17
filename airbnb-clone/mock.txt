@@ -1,0 +1,14 @@
+{
+    "amenities": [1,2,3,4,5,6],
+    "category": 2,
+    "name": "아름다운 집",
+    "country": "한국",
+    "city": "서울",
+    "price": 5000,
+    "rooms": 2,
+    "toilets": 2,
+    "description": "",
+    "address": "DRF is working",
+    "is_pet_friendly": true,
+    "kind": "private_room"
+}
