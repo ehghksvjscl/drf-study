@@ -10,7 +10,7 @@ from medias.models import Photo
 from medias.serializers import PhotoSerializer
 
 
-class PhotoDetail(APIView):
+class PhotosDetail(APIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 

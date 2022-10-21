@@ -5,4 +5,4 @@ from medias.models import Photo
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = ["file", "description"]
+        fields = ["pk", "file", "description"]
