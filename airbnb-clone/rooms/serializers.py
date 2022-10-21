@@ -15,6 +15,7 @@ class AmenitySerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     is_owner = serializers.SerializerMethodField()
+    photos = PhotoSerializer(many=True)
 
     def get_rating(self, room):
         return room.rating()
@@ -25,7 +26,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ["id", "name", "country", "city", "price", "rating", "is_owner"]
+        fields = ["id", "name", "country", "city", "price", "rating", "is_owner","photos"]
 
 
 class RoomDetailSerializer(serializers.ModelSerializer):
