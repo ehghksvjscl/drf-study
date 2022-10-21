@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 class Photo(BaseTimeTamplate):
     """Booking 모델링"""
 
-    file = models.ImageField()
+    file = models.URLField()
     description = models.CharField(max_length=140)
     room = models.ForeignKey(
         "rooms.Room", null=True, blank=True, on_delete=models.CASCADE
@@ -20,7 +20,7 @@ class Photo(BaseTimeTamplate):
 
 
 class Video(BaseTimeTamplate):
-    file = models.FileField()
+    file = models.URLField()
     experience = models.OneToOneField(
         "experiences.Experience", on_delete=models.CASCADE
     )

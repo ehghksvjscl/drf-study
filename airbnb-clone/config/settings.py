@@ -149,3 +149,10 @@ INTERNAL_IPS = [
 REST_FRAMEWORK = {
     "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",
 }
+
+# PAGENATION
+PAGE_SIZE = 3
+
+# MEDIA FILE SETTING
+MEDIA_ROOT = "uploads"
+MEDIA_URL = "user-upload/"
