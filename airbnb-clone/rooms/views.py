@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +16,8 @@ from rooms.crud import create_room_amenites
 from categories.crud import get_category_or_400
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
+from bookings.models import Booking
+from bookings.serializers import PublicBookingSerializer
 
 # Amenities
 class Amenities(APIView):
@@ -172,7 +175,7 @@ class RoomAmenities(APIView):
         return Response(serializer.data)
 
 
-class RoomPhoto(APIView):
+class RoomPhotos(APIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -188,3 +191,21 @@ class RoomPhoto(APIView):
             return Response(PhotoSerializer(photo).data)
         else:
             return Response(serializer.errors)
+
+class RoomBookings(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        return get_object_or_404(Room, pk=pk)
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        now = timezone.localdate(timezone.now())
+        bookings = Booking.objects.filter(
+            room__pk=room.pk, 
+            kind=Booking.BookingKindChoices.ROOM,
+            check_in__gt=now
+        )
+        serializer = PublicBookingSerializer(bookings, many=True)
+        return Response(serializer.data)
