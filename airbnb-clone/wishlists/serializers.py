@@ -7,6 +7,6 @@ class WishListSerializer(serializers.ModelSerializer):
     rooms = RoomSerializer(many=True, read_only=True)
     class Meta:
         model = Wishlist
-        fields = ("name","rooms")
+        fields = ("id","name","rooms")
 
 
