@@ -19,7 +19,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, blank=True, editable=False)
     name = models.CharField(default="", max_length=150, verbose_name="이름")
     is_host = models.BooleanField(default=False, verbose_name="호스트 여부")
-    avatar = models.ImageField(blank=True)
+    avatar = models.URLField(blank=True)
     gender = models.CharField(max_length=6, choices=GenderChoices.choices)
     language = models.CharField(
         max_length=2, choices=LanguageChoices.choices, default=LanguageChoices.KR

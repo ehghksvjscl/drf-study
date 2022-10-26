@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -192,6 +193,7 @@ class RoomPhotos(APIView):
         else:
             return Response(serializer.errors)
 
+
 class RoomBookings(APIView):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -203,24 +205,22 @@ class RoomBookings(APIView):
         room = self.get_object(pk)
         now = timezone.localdate(timezone.now())
         bookings = Booking.objects.filter(
-            room__pk=room.pk, 
-            kind=Booking.BookingKindChoices.ROOM,
-            check_in__gt=now
+            room__pk=room.pk, kind=Booking.BookingKindChoices.ROOM, check_in__gt=now
         )
         serializer = PublicBookingSerializer(bookings, many=True)
         return Response(serializer.data)
 
     def post(self, request, pk):
         room = self.get_object(pk)
-        serializer = CreateBookingSerializer(data=request.data)
+        serializer = CreateBookingSerializer(
+            data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
-            pass
-            # booking = serializer.save(
-            #     kind=Booking.BookingKindChoices.ROOM,
-            #     user=request.user,
-            #     room=room
-            # )
-            # return Response(CreateBookingSerializer(booking).data)
-            return Response(status=status.HTTP_200_OK)
+            booking = serializer.save(
+                kind=Booking.BookingKindChoices.ROOM,
+                user=request.user,
+                room=room,
+            )
+            return Response(PublicBookingSerializer(booking).data)
         else:
             return Response(serializer.errors)
