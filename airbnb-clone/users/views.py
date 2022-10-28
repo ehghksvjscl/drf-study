@@ -79,10 +79,6 @@ class ChangePassword(APIView):
             raise ParseError
 
 
-""" {
-"username":"admin","password":"admin"
-}
-"""
 class LogIn(APIView):
     def post(self, request):
         username = request.data.get('username')
