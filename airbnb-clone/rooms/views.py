@@ -18,7 +18,7 @@ from categories.crud import get_category_or_400
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
 from bookings.models import Booking
-from bookings.serializers import CreateBookingSerializer, PublicBookingSerializer
+from bookings.serializers import PublicBookingSerializer, CreateRoomBookingSerializer
 
 # Amenities
 class Amenities(APIView):
@@ -212,7 +212,7 @@ class RoomBookings(APIView):
 
     def post(self, request, pk):
         room = self.get_object(pk)
-        serializer = CreateBookingSerializer(
+        serializer = CreateRoomBookingSerializer(
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
