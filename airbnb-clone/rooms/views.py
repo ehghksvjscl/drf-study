@@ -13,7 +13,7 @@ from django.conf import settings
 from rooms.models import Amenity, Room
 from rooms.serializers import AmenitySerializer, RoomSerializer, RoomDetailSerializer
 from rooms.decorator import room_owner_check
-from rooms.crud import create_room_amenites
+from rooms.crud import create_room_amenites_or_category
 from categories.crud import get_category_or_400
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
@@ -78,7 +78,7 @@ class Rooms(APIView):
             category = get_category_or_400(request.data.get("category"))
 
             # Amenity
-            room = create_room_amenites(request, serializer, category)
+            room = create_room_amenites_or_category(request, serializer, category)
 
             return Response(RoomDetailSerializer(room).data)
         else:
@@ -108,7 +108,7 @@ class RoomDetail(APIView):
             category = get_category_or_400(category_pk)
 
             # Amenity
-            room = create_room_amenites(request, serializer, category)
+            room = create_room_amenites_or_category(request, serializer, category)
 
             return Response(RoomDetailSerializer(room).data)
 

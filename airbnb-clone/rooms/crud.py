@@ -5,7 +5,7 @@ from django.db import transaction
 from rooms.models import Amenity
 
 
-def create_room_amenites(request, room_serializer, category):
+def create_room_amenites_or_category(request, room_serializer, category):
     """
     parms: request , serializer, category
     """
