@@ -157,3 +157,11 @@ PAGE_SIZE = 3
 # MEDIA FILE SETTING
 MEDIA_ROOT = "uploads"
 MEDIA_URL = "user-upload/"
+
+# Authentication
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "config.authentication.CustomAuthentication",
+    ]
+}
