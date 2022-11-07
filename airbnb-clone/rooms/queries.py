@@ -11,3 +11,7 @@ def get_room(pk: int):
         return models.Room.objects.get(pk=pk)
     except models.Room.DoesNotExist:
         return None
+
+
+def create_room(info: Info):
+    pass
