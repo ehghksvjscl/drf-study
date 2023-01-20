@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Echo Page</title>
+    </head>
+    <body>
+        <h1>My Echo Page</h1>
+        <p>Here is the text you entered: {{ text }}</p>
+    </body>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8000/ws/echo/')
+
+        ws.onopen = () => {
+            ws.send('웹소켓 서버에 접속되었습니다.')
+        }
+
+        ws.onmessage = (event) => {
+            const message = event.data
+            console.log("수신한 문자열: " + message)
+        }
+
+        ws.onerror = () => {
+            console.log('WebSocket error: ', event)
+        }
+
+        ws.onclose = (event) => {
+            if(event.wasClean) {
+                console.log('ws close()로 인한 종료')
+            } else {
+                console.log('웹소켓 서바와의 네트워크 에러로 인한 종료')
+            }
+        }
+    </script>
+</html>
