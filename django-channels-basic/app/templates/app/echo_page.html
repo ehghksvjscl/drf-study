@@ -12,11 +12,13 @@
         const ws = new WebSocket('ws://localhost:8000/ws/echo/')
 
         ws.onopen = () => {
-            ws.send('웹소켓 서버에 접속되었습니다.')
+            console.log('웹소켓 연결 성공')
         }
 
         ws.onmessage = (event) => {
             const message = event.data
+            data = JSON.parse(message)
+
             console.log("수신한 문자열: " + message)
         }
 
