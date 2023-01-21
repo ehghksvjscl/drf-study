@@ -16,9 +16,9 @@ class Post(ChannelLayerGroupSendMixin, models.Model):
     
 def post__on_post_save(instance: Post, created: bool, **kwargs):
     if created:
-        message_type = 'liveblog.post.created'
+        message_type = 'liveblog_post_created'
     else:
-        message_type = 'liveblog.post.updated'
+        message_type = 'liveblog_post_updated'
 
     post_id = instance.id
     post_partial_url = reverse('post-partial', args=[post_id])
@@ -40,7 +40,7 @@ def post__on_post_delete(instance: Post, **kwargs):
     post_id = instance.id
 
     instance.channel_layer_group_send({
-        'type': 'liveblog.post.deleted',
+        'type': 'liveblog_post_deleted',
         'post_id': post_id
     })
 
