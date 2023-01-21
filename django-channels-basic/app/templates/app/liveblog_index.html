@@ -11,3 +11,39 @@
         </div>
     </div>
 {% endblock %}
+
+{% block extra-body %}
+    <script>
+        const handlers = {
+            ws: null,
+            connect(ws_url) {
+                this.ws = new WebSocket(ws_url);
+                this.ws.onopen = this.onopen.bind(this);
+                this.ws.onclose = this.onclose.bind(this);
+                this.ws.onerror = this.onerror.bind(this);
+                this.ws.onmessage = this.onmessage.bind(this);
+            },
+            onopen() {
+                console.log("웹소켓이랑 연결 되었습니다.")
+            },
+
+            onclose(event) {
+                if (!event.wasClean) {
+                    console.log("네트워크로 장애로인해 웹소켓이 끊겼습니다.")
+                }
+            },
+
+            onerror() {
+                console.log("웹소켓 에러가 발생했습니다.")
+            },
+
+            onmessage(event) {
+                const message_json = event.data;
+                console.log("수신된 데이터 : ", message_json)
+            }
+
+
+            
+        }
+    </script>
+{% endblock %}
