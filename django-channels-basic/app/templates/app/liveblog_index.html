@@ -40,10 +40,45 @@
             onmessage(event) {
                 const message_json = event.data;
                 console.log("수신된 데이터 : ", message_json)
+
+                const { type, post_id, post_partial_url } = JSON.parse(message_json);
+
+                switch(type) {
+                    case "liveblog_post_created":
+                        this.post_created(post_id, post_partial_url)
+                        break;
+                    case "liveblog_post_updated":
+                        this.post_updated(post_id, post_partial_url)
+                        break;
+                    case "liveblog_post_deleted":
+                        this.post_deleted(post_id)
+                        break;
+                    default:
+                        console.log(`Invalid message type : ${type}`)
+                }
+            },
+            post_created(post_id, post_partial_url) {
+                fetch(post_partial_url)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.querySelector("#post-list")
+                            .insertAdjacentHTML("afterbegin", html)
+                    })
+            },
+            post_updated(post_id, post_partial_url) {
+                fetch(post_partial_url)
+                    .then(response => response.text())
+                    .then(html => {
+                        const css_selector = `[data-post-id="${post_id}"]`;
+                        document.querySelector(css_selector).outerHTML = html;
+                    })
+            },
+            post_deleted(post_id) {
+                const css_selector = `[data-post-id="${post_id}"]`;
+                document.querySelector(css_selector).remove();
             }
-
-
-            
         }
+    const ws_url = 'ws://localhost:8000/ws/liveblog/';
+    handlers.connect(ws_url);
     </script>
 {% endblock %}
