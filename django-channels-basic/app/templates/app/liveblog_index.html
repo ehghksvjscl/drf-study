@@ -17,19 +17,34 @@
         const handlers = {
             ws: null,
             connect(ws_url) {
-                this.ws = new WebSocket(ws_url);
+                this.ws = new WebSocket(ws_url || this.ws?.url);
                 this.ws.onopen = this.onopen.bind(this);
                 this.ws.onclose = this.onclose.bind(this);
                 this.ws.onerror = this.onerror.bind(this);
                 this.ws.onmessage = this.onmessage.bind(this);
             },
+
+            reconnect() {
+                this.connect()
+            },
+
             onopen() {
                 console.log("웹소켓이랑 연결 되었습니다.")
+                this.retry = 0
             },
 
             onclose(event) {
                 if (!event.wasClean) {
                     console.log("네트워크로 장애로인해 웹소켓이 끊겼습니다.")
+                    
+                    if (this.retry < 3) {
+                        this.retry += 1
+                        console.log(`재연결 시도 ${this.retry}회`)
+                        this.reconnect()
+                    } else {
+                        alert("네트워크 장애로 인해 웹소켓이 끊겼습니다. 사이트 홈으로 이동합니다.")
+                        window.location.href = "/"
+                    }
                 }
             },
 
