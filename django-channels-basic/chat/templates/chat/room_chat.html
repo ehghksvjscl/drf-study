@@ -2,16 +2,26 @@
 
 {% block extra-style %}
 <style>
-    .chat-message {
+    .chat-message > div{
         background-color: #3b3b3b;
         color: #e1e1e1;
         border-radius: 0.8em;
         padding: 0.4em;
         margin: 0.4em 0;
-        display: block;
+        display: inline-block;
         white-space: pre-wrap;
-        max-width: max-content;
+        max-width: 80%;
         word-wrap: break-word;
+    }
+
+    .chat-message.me {
+        text-align: right;
+    }
+    .chat-message.me > div {
+        background-color: #1f8cff;
+        color: #fff;
+        text-align: left;
+        margin: 0.8em 1em;
     }
 </style>
 {% endblock %}
@@ -94,19 +104,26 @@
             const message_json = event.data;
             console.log("수신된 데이터 : ", message_json)
 
-            const { type, message } = JSON.parse(message_json);
+            const { type, message, sender } = JSON.parse(message_json);
 
             switch(type) {
                 case "chat.message":
-                    this.append_message(message)
+                    this.append_message(message, sender)
                     break;
                 default:
                     console.log(`Invalid message type : ${type}`)
             }
         },
-        append_message(message) {
+        append_message(message, sender) {
             const element = document.createElement('div');
             element.className = 'chat-message';
+
+            let = footer = ""
+            if (sender === "{{ user.username }}") {
+                element.className += " me"
+            } else if (sender){
+                footer = ` from ${sender}`
+            }
 
             const wapper = document.createElement('div');
             wapper.textContent = message;

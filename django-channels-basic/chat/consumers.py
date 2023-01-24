@@ -35,6 +35,7 @@ class ChatConsumer(JsonWebsocketConsumer):
 
     def receive_json(self, content, **kwargs):
         _type = content['type']
+        user = self.scope['user']
 
         if _type == "chat.message":
             message = content['message']
@@ -42,7 +43,8 @@ class ChatConsumer(JsonWebsocketConsumer):
                 self.group_name,
                 {
                     "type": "chat.message",
-                    "message": message
+                    "message": message,
+                    "sender" : user.username
                 }
             )
         else:
@@ -51,5 +53,6 @@ class ChatConsumer(JsonWebsocketConsumer):
     def chat_message(self, message_dict):
         self.send_json({
             "type": "chat.message",
-            "message": message_dict['message']
+            "message": message_dict['message'],
+            "sender" : message_dict['sender']
         })
