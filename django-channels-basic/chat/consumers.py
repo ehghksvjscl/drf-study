@@ -12,15 +12,19 @@ class ChatConsumer(JsonWebsocketConsumer):
 
     def connect(self):
         room_pk = self.scope['url_route']['kwargs']['room_pk']
+        user = self.scope['user']
 
-        self.group_name = Room.make_chat_group_name(room_pk=room_pk)
+        if not user.is_authenticated:
+            self.close()
+        else:
+            self.group_name = Room.make_chat_group_name(room_pk=room_pk)
 
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name,
-            self.channel_name
-        )
+            async_to_sync(self.channel_layer.group_add)(
+                self.group_name,
+                self.channel_name
+            )
 
-        self.accept()
+            self.accept()
 
     def disconnect(self, close_code):
         if self.group_name:
