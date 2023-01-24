@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     'django_bootstrap5',
 
     # local app
-    'app'
+    'app',
+    'chat',
 ]
 
 MIDDLEWARE = [

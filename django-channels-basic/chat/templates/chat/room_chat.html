@@ -1,0 +1,81 @@
+{% extends "chat/base.html" %}
+
+{% block extra-style %}
+<style>
+    .chat-message {
+        background-color: #3b3b3b;
+        color: #e1e1e1;
+        border-radius: 0.8em;
+        padding: 0.4em;
+        margin: 0.4em 0;
+        display: inline-block;
+        white-space: pre-wrap;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card" style="height: 600px">
+                <div class="card-header">
+                    채팅방 : {{ room_name }}
+                </div>
+                <div class="card-body overflow-hidden">
+                    <div id="chat-messages" class="w-100 h-100 border-0 overflow-scroll"></div>
+                </div>
+                <div class="card-footer">
+                    <form id="message_form">
+                        <input type="text" name="message" class="form-control" autofocus autocomplete="off" />
+                    </form>
+                </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <a href="{% url 'chat:index' %}" class="btn btn-primary">대기실로 이동</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra-script %}
+<script>
+    const handelers = {
+        chat_messages_tag: null,
+
+        init() {
+            this.chat_messages_tag = document.querySelector('#chat-messages');
+            document.querySelector('#message_form').addEventListener('submit', this.onsubmit.bind(this));
+        },
+        append_message(message) {
+            const element = document.createElement('div');
+            element.className = 'chat-message';
+
+            const wapper = document.createElement('div');
+            wapper.textContent = message;
+            element.appendChild(wapper);
+
+            this.chat_messages_tag.appendChild(element);
+            this.chat_messages_tag.scrollTop = this.chat_messages_tag.scrollHeight;
+        },
+        onsubmit(event) {
+            event.preventDefault();
+
+            const form_data = new FormData(event.target);
+            const props = Object.fromEntries(form_data);
+            event.target.reset();
+
+            const { message } = props;
+            console.log("웹소켓으로 전송할 메시지:", message)
+            this.append_message(message);
+        }
+    }
+    handelers.init();
+</script>
+{% endblock %}
