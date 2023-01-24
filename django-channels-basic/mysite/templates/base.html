@@ -1,0 +1,38 @@
+{% load django_bootstrap5 %}
+
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <title>Django Channels</title>
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {% block extra-style %}{% endblock %}
+    </head>
+    <body>
+        <div class="container">
+            <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+              <a href="/" class="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none">
+                장고 체널스
+            </a>
+        
+              <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="#" class="nav-link px-2 link-secondary">채팅</a></li>
+              </ul>
+        
+              <div class="col-md-3 text-end">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary me-2">프로필</a>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-primary">로그아웃</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary me-2">로그인</a>
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary">회원가입</a>
+                {% endif %}
+            </div>
+            </header>
+          </div>
+        {% block content %}
+        {% endblock %}
+        {% block extra-script %}{% endblock %}
+    </body>
+</html>
