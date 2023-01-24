@@ -8,9 +8,9 @@
         border-radius: 0.8em;
         padding: 0.4em;
         margin: 0.4em 0;
-        display: inline-block;
+        display: block;
         white-space: pre-wrap;
-        max-width: 80%;
+        max-width: max-content;
         word-wrap: break-word;
     }
 </style>
@@ -48,10 +48,61 @@
 <script>
     const handelers = {
         chat_messages_tag: null,
+        ws: null,
+        retry: 0,
 
         init() {
             this.chat_messages_tag = document.querySelector('#chat-messages');
             document.querySelector('#message_form').addEventListener('submit', this.onsubmit.bind(this));
+        },
+        reconnect() {
+            this.connect()
+        },
+        connect(ws_url) {
+            this.ws = new WebSocket(ws_url || this.ws?.url);
+            console.log(ws_url)
+
+            this.ws.onopen = this.onopen.bind(this);
+            this.ws.onclose = this.onclose.bind(this);
+            this.ws.onerror = this.onerror.bind(this);
+            this.ws.onmessage = this.onmessage.bind(this);
+        },
+        onopen() {
+                console.log("웹소켓이랑 연결 되었습니다.")
+                this.retry = 0
+            },
+
+        onclose(event) {
+            if (!event.wasClean) {
+                console.log("네트워크로 장애로인해 웹소켓이 끊겼습니다.")
+                
+                if (this.retry < 3) {
+                    this.retry += 1
+                    console.log(`재연결 시도 ${this.retry}회`)
+                    this.reconnect()
+                } else {
+                    alert("네트워크 장애로 인해 웹소켓이 끊겼습니다. 사이트 홈으로 이동합니다.")
+                    window.location.href = "{% url 'chat:index' %}"
+                }
+            }
+        },
+        onerror() {
+            console.log("웹소켓 에러가 발생했습니다.")
+            // window.location.href = "{% url 'chat:index' %}"
+        },
+        onmessage(event) {
+            const message_json = event.data;
+            console.log("수신된 데이터 : ", message_json)
+
+            const { type, message } = JSON.parse(message_json);
+
+            switch(type) {
+                case "chat.message":
+                    this.append_message(message)
+                    break;
+                default:
+                    console.log(`Invalid message type : ${type}`)
+            }
         },
         append_message(message) {
             const element = document.createElement('div');
@@ -73,9 +124,17 @@
 
             const { message } = props;
             console.log("웹소켓으로 전송할 메시지:", message)
-            this.append_message(message);
+
+            this.ws.send(JSON.stringify({
+                type: "chat.message",
+                message: message
+            }));
         }
     }
     handelers.init();
+
+    const protocol = location.protocol === "http:" ? "ws:" : "wss:";
+    const ws_url = protocol + "//" + location.host + "/ws" + location.pathname;
+    handelers.connect(ws_url);
 </script>
 {% endblock %}

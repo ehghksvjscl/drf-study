@@ -7,8 +7,8 @@ class ChatConsumer(JsonWebsocketConsumer):
     SQUARER_GROUP_NAME = "square"
     groups = [SQUARER_GROUP_NAME]
 
-    def recevie_json(self, content, **kwargs):
-        _type = [content['type']]
+    def receive_json(self, content, **kwargs):
+        _type = content['type']
 
         if _type == "chat.message":
             message = content['message']
