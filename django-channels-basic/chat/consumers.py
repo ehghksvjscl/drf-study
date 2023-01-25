@@ -31,7 +31,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                         self.group_name,
                         {
                             "type": "chat.user.join",
-                            "usermame" : user.username
+                            "username" : user.username
                         }
                     )
 
@@ -50,15 +50,17 @@ class ChatConsumer(JsonWebsocketConsumer):
             )
 
         user = self.scope['user']
-        is_last_leave = self.room.user_leave(self.channel_name, user)
-        if is_last_leave:
-            async_to_sync(self.channel_layer.group_send)(
-                self.group_name,
-                {
-                    "type": "chat.user.leave",
-                    "username" : user.username
-                }
-            )
+
+        if self.room is not None:
+            is_last_leave = self.room.user_leave(self.channel_name, user)
+            if is_last_leave:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.group_name,
+                    {
+                        "type": "chat.user.leave",
+                        "username" : user.username
+                    }
+                )
 
     def receive_json(self, content, **kwargs):
         _type = content['type']

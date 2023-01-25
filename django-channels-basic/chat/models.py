@@ -48,6 +48,7 @@ class OnlineUserMixin(models.Model):
     def user_leave(self, channel_name, user):
         try:
             room_member = RoomMember.objects.get(room=self, user=user)
+            print(room_member)
         except RoomMember.DoesNotExist:
             return True
 

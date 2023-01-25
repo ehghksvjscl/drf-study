@@ -132,11 +132,17 @@
             const message_json = event.data;
             console.log("수신된 데이터 : ", message_json)
 
-            const { type, message, sender } = JSON.parse(message_json);
+            const { type, message, sender, username } = JSON.parse(message_json);
 
             switch(type) {
                 case "chat.message":
                     this.append_message(message, sender)
+                    break;
+                case "chat.user.join":
+                    this.append_message(`${username}님이 입장하셨습니다.`)
+                    break;
+                case "chat.user.leave":
+                    this.append_message(`${username}님이 퇴장하셨습니다.`)
                     break;
                 default:
                     console.log(`Invalid message type : ${type}`)
