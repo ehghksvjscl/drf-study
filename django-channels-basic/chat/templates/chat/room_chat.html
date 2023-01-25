@@ -104,7 +104,14 @@
             },
 
         onclose(event) {
-            if (!event.wasClean) {
+            const ROOM_DELETE_CODE = 4000
+
+            if (event.code === ROOM_DELETE_CODE) {
+                this.modal("체팅방이 삭제 되었습니다.", () => {
+                    window.location.href = "{% url 'chat:index' %}"
+                })
+            }
+            else if (!event.wasClean) {
                 console.log("네트워크로 장애로인해 웹소켓이 끊겼습니다.")
                 
                 if (this.retry < 3) {
