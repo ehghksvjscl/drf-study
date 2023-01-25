@@ -9,6 +9,7 @@ class ChatConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.group_name = ""
+        self.room = None
 
     def connect(self):
         room_pk = self.scope['url_route']['kwargs']['room_pk']
@@ -17,20 +18,46 @@ class ChatConsumer(JsonWebsocketConsumer):
         if not user.is_authenticated:
             self.close()
         else:
-            self.group_name = Room.make_chat_group_name(room_pk=room_pk)
+            try:
+                self.room = Room.objects.get(pk=room_pk)
+            except Room.DoesNotExist:
+                self.close()
+            else:
+                self.group_name = self.room.chat_group_name
 
-            async_to_sync(self.channel_layer.group_add)(
-                self.group_name,
-                self.channel_name
-            )
+                is_new_join = self.room.user_join(self.channel_name, user)
+                if is_new_join:
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.group_name,
+                        {
+                            "type": "chat.user.join",
+                            "usermame" : user.username
+                        }
+                    )
 
-            self.accept()
+                async_to_sync(self.channel_layer.group_add)(
+                    self.group_name,
+                    self.channel_name
+                )
+
+                self.accept()
 
     def disconnect(self, close_code):
         if self.group_name:
             async_to_sync(self.channel_layer.group_discard)(
                 self.group_name,
                 self.channel_name
+            )
+
+        user = self.scope['user']
+        is_last_leave = self.room.user_leave(self.channel_name, user)
+        if is_last_leave:
+            async_to_sync(self.channel_layer.group_send)(
+                self.group_name,
+                {
+                    "type": "chat.user.leave",
+                    "username" : user.username
+                }
             )
 
     def receive_json(self, content, **kwargs):
@@ -61,3 +88,15 @@ class ChatConsumer(JsonWebsocketConsumer):
         ROOM_DELETED_CODE = 4000
         custom_code = ROOM_DELETED_CODE
         self.close(code=custom_code)
+
+    def chat_user_join(self, message_dict):
+        self.send_json({
+            "type": "chat.user.join",
+            "username" : message_dict['username']
+        })
+
+    def chat_user_leave(self, message_dict):
+        self.send_json({
+            "type": "chat.user.leave",
+            "username" : message_dict['username']
+        })
